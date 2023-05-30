@@ -5,9 +5,10 @@ app = FastAPI()
 db = Database()
 
 @app.get("/")
-async def check_database_connection():
+async def start_page():
     try:
-        await db.connector.client.admin.command("ping")
-        return {"message": "Successfully connected to the database!"}
+        cars = await db.get_cars()
+        return cars
     except Exception as e:
-        return {"message": "Failed to connect to the database.", "error": str(e)}
+        return {"message": "Failed to retrieve cars from the database.", "error": str(e)}
+
