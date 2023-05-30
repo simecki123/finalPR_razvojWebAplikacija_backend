@@ -16,7 +16,7 @@ class User(BaseModel):
     phone: int
     role: str
 
-class User_car(BaseModel):
+class UserCar(BaseModel):
     id: int = Field(alias="_id")
     id_car: int
     id_user: int
