@@ -4,7 +4,7 @@ import models
 
 app = FastAPI()
 db = Database()
-
+# Cars...................................................
 # First that will user see is list of all cars we have.
 @app.get("/")
 async def start_page():
@@ -48,5 +48,33 @@ async def delete_car(car_id: int):
         await db.delete_car(car_id)
         return {"message": "Car deleted successfully"}
     except Exception as e:
-        return {"message": "Something went wrong while deleting a new car", "error": str(e)}
+        return {"message": "Something went wrong while deleting a car", "error": str(e)}
     
+# Users.............................................................................................
+# Method that will show us all users we have
+@app.get("/Users")
+async def start_page():
+    try:
+        users = await db.get_users
+        return users
+    except Exception as e:
+        return {"message": "Failed to retrieve users from the database.", "error": str(e)}
+
+# Method that will allow us to create new user
+@app.post("/add_user")
+async def add_user(user: models.User):
+    try:
+        await db.add_user(user)
+        return {"message": "User added successfully"}
+    except Exception as e:
+        return {"message": "Something went wrong while adding a new user", "error": str(e)}
+
+
+# Method that will allow us to delete some specific user.
+@app.delete("/delete_user/{user_id}")
+async def delete_user(user_id: int):
+    try:
+        await db.delete_user(user_id)
+        return {"message": "User deleted successfully"}
+    except Exception as e:
+        return {"message": "Something went wrong while deleting a User", "error": str(e)}

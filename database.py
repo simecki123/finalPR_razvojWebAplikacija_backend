@@ -7,8 +7,8 @@ from typing import Optional
 import models
 
 # MongoDB configuration
-MONGODB_URL = "***********"  # Update with your MongoDB connection URL
-DB_NAME = "*************"  # Update with your database name
+MONGODB_URL = "*****************"  # Update with your MongoDB connection URL
+DB_NAME = "****************"  # Update with your database name
 
 # Database connector
 class DatabaseConnector:
@@ -50,7 +50,7 @@ class Database:
             return "Car not found."
 
 
-
+# This method will allow us to see all users in our database
     async def get_users(self):
         collection = self.connector.get_collection("users")
         users = await collection.find().to_list(None)
@@ -71,7 +71,7 @@ class Database:
     
         await collection.insert_one(car.dict())
 
-
+# This method will allow us to create new user
     async def add_user(self, user: models.User):
         collection = self.connector.get_collection("users")
         existing_user = await collection.find_one({"id": user.id})
@@ -95,6 +95,7 @@ class Database:
         collection = self.connector.get_collection("cars")
         await collection.delete_one({"id": car_id})
 
+# This method will delete selected user
     async def delete_user(self, user_id: int):
         collection = self.connector.get_collection("users")
         await collection.delete_one({"id": user_id})
