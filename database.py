@@ -7,8 +7,8 @@ from typing import Optional
 import models
 
 # MongoDB configuration
-MONGODB_URL = "mongodb+srv://sroncevic19:w4xw08PT1lpn2aXE@demo.zvdgd5c.mongodb.net/"  # Update with your MongoDB connection URL
-DB_NAME = "Renta-car"  # Update with your database name
+MONGODB_URL = "***********"  # Update with your MongoDB connection URL
+DB_NAME = "*************"  # Update with your database name
 
 # Database connector
 class DatabaseConnector:
