@@ -1,9 +1,35 @@
-from fastapi import FastAPI
+from typing import Optional
+from fastapi import FastAPI, HTTPException
 from database import Database
 import models
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from security import authenticate_user, create_access_token, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+
 
 app = FastAPI()
 db = Database()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
+# Security
+@app.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await authenticate_user(form_data.username, form_data.password)  
+    if not user:
+        return {"message": "Invalid username or password"}
+    access_token = create_access_token(user)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# Testing security
+@app.get("/protected_route")
+async def protected_route(current_user: Optional[models.User] = Depends(get_current_user)):
+    if current_user:
+        user = await current_user
+        return user
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
 # Cars...................................................
 # First that will user see is list of all cars we have.
 @app.get("/")
@@ -53,9 +79,9 @@ async def delete_car(car_id: int):
 # Users.............................................................................................
 # Method that will show us all users we have
 @app.get("/Users")
-async def start_page():
+async def all_users():
     try:
-        users = await db.get_users
+        users = await db.get_users()  # Add parentheses to call the method
         return users
     except Exception as e:
         return {"message": "Failed to retrieve users from the database.", "error": str(e)}
@@ -78,3 +104,11 @@ async def delete_user(user_id: int):
         return {"message": "User deleted successfully"}
     except Exception as e:
         return {"message": "Something went wrong while deleting a User", "error": str(e)}
+
+@app.get("/get_user_by_mail/{mail}")
+async def get_user_email(user_mail: str):
+    try:
+        user = await db.get_user_by_email(user_mail)
+        return user
+    except Exception as e:
+        return {"message": "Failed to retrieve users from the database.", "error": str(e)}

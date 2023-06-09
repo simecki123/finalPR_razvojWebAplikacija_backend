@@ -1,3 +1,4 @@
+import bcrypt
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -7,8 +8,8 @@ from typing import Optional
 import models
 
 # MongoDB configuration
-MONGODB_URL = "*****************"  # Update with your MongoDB connection URL
-DB_NAME = "****************"  # Update with your database name
+MONGODB_URL = "mongodb+srv://sroncevic19:w4xw08PT1lpn2aXE@demo.zvdgd5c.mongodb.net/"  # Update with your MongoDB connection URL
+DB_NAME = "Renta-car"  # Update with your database name
 
 # Database connector
 class DatabaseConnector:
@@ -55,6 +56,26 @@ class Database:
         collection = self.connector.get_collection("users")
         users = await collection.find().to_list(None)
         return [models.User(**user) for user in users]
+    
+# Method for returning user by email
+    async def get_user_by_email(self, email: str, password: str) -> Optional[models.User]:
+        collection = self.connector.get_collection("users")
+        user = await collection.find_one({"email": email})
+        if user:
+            user_obj = models.User(**user)
+            if user_obj.verify_password(password):
+                return user_obj
+        return None
+
+    async def find_curent_user_by_email(self, email: str) -> Optional[models.User]:
+        collection = self.connector.get_collection("users")
+        user = await collection.find_one({"email": email})
+        if user:
+            user_obj = models.User(**user)
+            return user_obj
+        return None
+
+
 
     async def get_user_cars(self):
         collection = self.connector.get_collection("user_cars")
@@ -74,12 +95,19 @@ class Database:
 # This method will allow us to create new user
     async def add_user(self, user: models.User):
         collection = self.connector.get_collection("users")
-        existing_user = await collection.find_one({"id": user.id})
+        existing_user = await collection.find_one({"email": user.email})
 
         if existing_user:
-            raise ValueError("User with the same ID already exists")
+            raise ValueError("User with the same email already exists")
 
-        await collection.insert_one(user.dict())
+        hashed_password = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt())
+
+        user_dict = user.dict()
+        user_dict["password"] = hashed_password.decode("utf-8")
+
+        await collection.insert_one(user_dict)
+
+
 
     async def add_user_car(self, user_car: models.UserCar):
         collection = self.connector.get_collection("user_cars")
