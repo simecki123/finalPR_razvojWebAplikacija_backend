@@ -6,4 +6,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 bcrypt
 pymongo
-
+python-dotenv

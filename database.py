@@ -9,12 +9,15 @@ from typing import Optional
 import models
 from jose import jwt
 from jose.exceptions import JWTError
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env file
+load_dotenv("mongo.env")
 
 # MongoDB configuration
-MONGODB_URL = "mongodb+srv://sroncevic19:w4xw08PT1lpn2aXE@demo.zvdgd5c.mongodb.net/"  # Update with your MongoDB connection URL
-DB_NAME = "Renta-car"  # Update with your database name
-
+MONGODB_URL = os.getenv("MONGODB_URL")
+DB_NAME = os.getenv("DB_NAME")
 # Database connector
 class DatabaseConnector:
     def __init__(self):
