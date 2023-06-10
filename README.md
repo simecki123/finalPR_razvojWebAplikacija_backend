@@ -1,4 +1,3 @@
-# Renta car application
 # Getting Started with Application
 
 This guide provides step-by-step instructions for setting up and running the application on your local machine.
@@ -54,9 +53,9 @@ This will install all the necessary dependencies for the application.
 
 ## Configure Environment Variables
 
-1. Rename the `mongo.env.example` file to `mongo.env`.
+1. Rename the `.env.example` file to `.env`.
 
-2. Open the `mongo.env` file and update the MongoDB connection URL and database name according to your setup.
+2. Open the `.env` file and update the MongoDB connection URL and database name according to your setup.
 
 ## Start the Application
 
@@ -71,5 +70,4 @@ This will start the application server and enable auto-reloading for code change
 
 ## Conclusion
 
-You have successfully set up and started the application on your local machine. Now you can start and explore all of it's features.
-
+You have successfully set up and started the application on your local machine. Now you can explore and use the features of the application.
