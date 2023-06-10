@@ -145,3 +145,12 @@ class Database:
         collection = self.connector.get_collection("user_cars")
         await collection.delete_one({"id_user": user_id, "id_car": car_id})
 
+# Method for admin to delete certain things
+    async def admin_delete_user_car(self, car_id: int):
+        collection = self.connector.get_collection("user_cars")
+        await collection.delete_one({"id_car": car_id})
+
+# Method for admin to delete certain things
+    async def admin_delete_user_car_through_user(self, user_id: int):
+        collection = self.connector.get_collection("user_cars")
+        await collection.delete_one({"id_user": user_id})

@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import bcrypt
 
-
+# Class that represents object car.
 class Cars(BaseModel):
     id: int
     name: str
@@ -15,6 +15,7 @@ class Cars(BaseModel):
         allow_population_by_field_name = True
         fields = {"_id": "id"}
 
+# Class that represents object User.
 class User(BaseModel):
     id: int
     name: str
@@ -32,6 +33,7 @@ class User(BaseModel):
         allow_population_by_field_name = True
         fields = {"_id": "id"}
 
+# Class that represents relation between user and car.
 class UserCar(BaseModel):
     _id: ObjectId = Field(default_factory=ObjectId, alias="id")
     id_car: int

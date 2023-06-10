@@ -4,3 +4,6 @@ python-multipart
 motor
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt
+pymongo
+

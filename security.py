@@ -54,6 +54,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> models.User:
 
     return user
 
+# Autentichate user
 async def authenticate_user(email: str, password: str) -> Optional[models.User]:
     user = await db.get_user_by_email(email, password)
     if not user:
