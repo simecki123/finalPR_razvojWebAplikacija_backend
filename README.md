@@ -1,6 +1,7 @@
 # Getting Started with Application
 
 This guide provides step-by-step instructions for setting up and running the application on your local machine.
+This project is renta car application. This application uses MongoDb database with 3 collections. One stores car objects, other stores user object and the third one stores relation between user and car it reserved. User can be ordinary user, employee or admin. We can reserve and return car. Create new cars and delete cars. We can add and delete users. We can also search defined user or car...
 
 ## Prerequisites
 
