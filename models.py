@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pydantic import BaseModel, Field
 from typing import Optional
 import bcrypt
@@ -32,8 +33,11 @@ class User(BaseModel):
         fields = {"_id": "id"}
 
 class UserCar(BaseModel):
-    id: int = Field(alias="_id")
+    _id: ObjectId = Field(default_factory=ObjectId, alias="id")
     id_car: int
     id_user: int
 
-    
+    class Config:
+        allow_population_by_field_name = True
+
+        

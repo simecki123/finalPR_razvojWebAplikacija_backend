@@ -49,14 +49,47 @@ async def find_car_by_mark(mark: str):
     except Exception as e:
         return {"message": "Failed to retrive car with defined mark", "error": str(e)}
 
-# Method that will allow user to reserve some availible car.
+# Method for reservation of wanted car
 @app.get("/car_id/{id}")
-async def find_car_by_ID_and_reserve(id: int):
+async def find_car_by_ID_and_reserve(id: int, current_user: Optional[models.User] = Depends(get_current_user)):
     try:
-        cars = await db.get_id_car_and_update(id)
-        return cars
+        if current_user:
+            car, isgood = await db.get_id_car_and_update(id)
+            user = await current_user
+            if (isgood):
+                if isinstance(car, models.Cars):
+                    user_car = models.UserCar(id_car=car.id, id_user=user.id)
+                    await db.add_user_car(user_car)
+                    return user_car
+                else:
+                    raise HTTPException(status_code=409, detail=car)  # Car not found or already taken
+            else:
+                return car
+        else:
+            raise HTTPException(status_code=401, detail="Unauthorized")
     except Exception as e:
-        return {"message": "Failed to retrive car with specififc id", "error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# Meethod that allows user to return reserved car
+@app.get("/return_car/{id}")
+async def find_car_by_ID_and_return(id: int, current_user: Optional[models.User] = Depends(get_current_user)):
+    try:
+        if current_user:
+            car, isgood = await db.get_car_and_return(id)
+            user = await current_user
+            if(isgood):
+                if isinstance(car, models.Cars):
+                    await db.delete_user_car(user.id, car.id)
+                    return car
+                else:
+                    raise HTTPException(status_code=409, detail=car)  # Car not found or already taken
+            else:
+                return car
+        else:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Method that adds new car to the database.
 @app.post("/add_car")
@@ -105,6 +138,7 @@ async def delete_user(user_id: int):
     except Exception as e:
         return {"message": "Something went wrong while deleting a User", "error": str(e)}
 
+# Method that gets any user by its email
 @app.get("/get_user_by_mail/{mail}")
 async def get_user_email(user_mail: str):
     try:

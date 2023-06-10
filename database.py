@@ -1,4 +1,5 @@
 import bcrypt
+from fastapi import HTTPException
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -6,6 +7,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
 from typing import Optional
 import models
+from jose import jwt
+from jose.exceptions import JWTError
+
 
 # MongoDB configuration
 MONGODB_URL = "mongodb+srv://sroncevic19:w4xw08PT1lpn2aXE@demo.zvdgd5c.mongodb.net/"  # Update with your MongoDB connection URL
@@ -40,16 +44,28 @@ class Database:
     async def get_id_car_and_update(self, car_id: int):
         collection = self.connector.get_collection("cars")
         car = await collection.find_one({"id": car_id})
-    
+
         if car:
             if car["reserved"]:
-                return "Car is already taken."
+                return "Car is already taken.", False
             else:
                 await collection.update_one({"id": car_id}, {"$set": {"reserved": True}})
-                return models.Cars(**car)
+                return models.Cars(**car), True
         else:
-            return "Car not found."
+            return HTTPException(status_code=404, detail="Car not found.")
 
+# Database method that updates car to not be reserved
+    async def get_car_and_return(self, car_id: int):
+        collection = self.connector.get_collection("cars")
+        car = await collection.find_one({"id": car_id})
+        if car:
+            if car["reserved"]:
+                await collection.update_one({"id": car_id}, {"$set": {"reserved": False}})
+                return models.Cars(**car), True
+            else:
+                return "Car is not reserved, cant return it", False
+        else:
+            return HTTPException(status_code=404, detail="Car not found.")
 
 # This method will allow us to see all users in our database
     async def get_users(self):
@@ -67,6 +83,7 @@ class Database:
                 return user_obj
         return None
 
+# Method that finds curently active user by email
     async def find_curent_user_by_email(self, email: str) -> Optional[models.User]:
         collection = self.connector.get_collection("users")
         user = await collection.find_one({"email": email})
@@ -76,7 +93,7 @@ class Database:
         return None
 
 
-
+# Method that finds relations between user and cars
     async def get_user_cars(self):
         collection = self.connector.get_collection("user_cars")
         user_cars = await collection.find().to_list(None)
@@ -108,14 +125,9 @@ class Database:
         await collection.insert_one(user_dict)
 
 
-
+# This method will add relation between user and the car
     async def add_user_car(self, user_car: models.UserCar):
         collection = self.connector.get_collection("user_cars")
-        existing_user_car = await collection.find_one({"id": user_car.id})
-
-        if existing_user_car:
-            raise ValueError("User car with the same ID already exists")
-
         await collection.insert_one(user_car.dict())
 
 # This method will delete selected car
@@ -128,7 +140,8 @@ class Database:
         collection = self.connector.get_collection("users")
         await collection.delete_one({"id": user_id})
 
-    async def delete_user_car(self, user_car_id: int):
+# This method will delete selected relation between user and car
+    async def delete_user_car(self, user_id: int, car_id: int):
         collection = self.connector.get_collection("user_cars")
-        await collection.delete_one({"id": user_car_id})
+        await collection.delete_one({"id_user": user_id, "id_car": car_id})
 
